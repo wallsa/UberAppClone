@@ -12,11 +12,14 @@ import MapKit
 protocol RideActionViewDelegate: AnyObject{
     func uploadTrip(view:RideActionView)
     func cancelTrip()
+    func pickupPassenger()
+    func dropOffPassenger()
 }
 //MARK: - Configuration Enums
 enum RideActionViewConfiguration{
     case requestRide
     case tripAccepted
+    case driverArrived
     case pickupPassenger
     case tripInProgress
     case endTrip
@@ -67,10 +70,14 @@ class RideActionView: UIView {
     
 //MARK: - Properties
     
-//    var rideActionConfig = RideActionViewConfiguration()
+
     var buttonActionConfig = ButtonActionConfiguration()
     weak var delegate:RideActionViewDelegate?
     var user: User?
+    
+    var config = RideActionViewConfiguration(){
+        didSet { configureUI(withConfig: config)}
+    }
     
     
     var destination:MKPlacemark?{
@@ -144,10 +151,6 @@ class RideActionView: UIView {
     
 //MARK: - Selectors
     
-    @objc func handleCancelRide(){
-        
-    }
-    
     @objc func handleConfirmRide(){
         switch buttonActionConfig {
         case .requestRide:
@@ -157,11 +160,10 @@ class RideActionView: UIView {
         case .getDirections:
             print("DEBUG: HANDLE GET DIRECTIONS")
         case .pickup:
-            print("DEBUG: HANDLE PICKUP")
+            delegate?.pickupPassenger()
         case .dropOff:
-            print("DEBUG: HANDLE DROPOFF")
+            delegate?.dropOffPassenger()
         }
-        
     }
     
 //MARK: - Helper Functions
@@ -196,7 +198,7 @@ class RideActionView: UIView {
     }
  /* devido a nossa logica em nossa HomeController, estamos enviando para nossa funcao um usuario driver para nossa config de rider e o inverso é valido, assim em nossa configuracao, quando o usuario é um driver configuramos para disponibilizar as informacoes do rider
   Cada usuario ve as informacoes do outro, nao as proprias */
-    func configureUI(withConfig config:RideActionViewConfiguration){
+    private func configureUI(withConfig config:RideActionViewConfiguration){
         switch config {
         case .requestRide:
             buttonActionConfig = .requestRide
@@ -217,6 +219,14 @@ class RideActionView: UIView {
             initialLetterLabel.text = String(user.fullname.first ?? "X")
             infoLabel.text = user.fullname
             
+        case .driverArrived:
+            guard let user = user else {return}
+            
+            if user.accountType == .driver {
+                localNameLabel.text = "Driver has Arrived"
+                adressLabel.text = "Please meet driver at pickup location"
+            }
+            
         case .pickupPassenger:
             
             localNameLabel.text = "Arrived at Passenger Location"
@@ -227,12 +237,14 @@ class RideActionView: UIView {
             
             guard let user = user else {return}
             
-            if user.accountType == .driver {
-                actionButton.setTitle("TRIP IN PROGRESS", for: .normal)
-                actionButton.isEnabled = false
-            } else {
+            if user.accountType == .passenger {
+                localNameLabel.text = "Go towards the passenger's destination"
                 buttonActionConfig = .getDirections
                 actionButton.setTitle(buttonActionConfig.description, for: .normal)
+            } else {
+                localNameLabel.text = "Going to your destination"
+                actionButton.isEnabled = false
+                actionButton.setTitle("TRIP IN PROGRESS", for: .normal)
             }
             
         case .endTrip:
@@ -245,6 +257,8 @@ class RideActionView: UIView {
                 buttonActionConfig = .dropOff
                 actionButton.setTitle(buttonActionConfig.description, for: .normal)
             }
+            localNameLabel.text = "Arrived At Destination"
+       
         }
     }
     

@@ -16,4 +16,5 @@ struct K {
 struct Images {
     static let menuImage = "menu"
     static let backButton36p = "backButton36"
+    static let driverAnnot = "annotationDriver"
 }

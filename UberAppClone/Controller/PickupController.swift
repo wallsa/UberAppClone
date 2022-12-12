@@ -79,7 +79,7 @@ class PickupController:UIViewController{
     
     @objc func handleAcceptTrip(){
         print("DEBUG: Deal with accept trip")
-        Service.shared.acceptTrip(trip: trip) { error, dataref in
+        DriverService.shared.acceptTrip(trip: trip) { error, dataref in
             self.delegate?.didAcceptTrip(self.trip)
         }
     }
@@ -89,10 +89,7 @@ class PickupController:UIViewController{
     func configureMapview(){
         mapView.region = .init(center: trip.pickupCoordinates, latitudinalMeters: 1000, longitudinalMeters: 1000)
         let anno = MKPointAnnotation()
-        anno.coordinate = trip.pickupCoordinates
-        
-        mapView.addAnnotation(anno)
-        mapView.selectAnnotation(anno, animated: true)
+        mapView.addAnnotationAndSelect(forCoordinates: trip.pickupCoordinates)
         
     }
     func configureUI(){
