@@ -9,9 +9,36 @@ import UIKit
 
 private let reuseIdentifier = "MenuCell"
 
+//MARK: - Delegate Protocol
+
+protocol MenuControllerDelegate:AnyObject {
+    func didSelect(option:MenuOptions)
+}
+
+//MARK: - Enums
+//Case Iterable possibilita nossa enum de alguns metodos  iteraveis assim utilizamos no metodo de nossa tableview,
+//CustoStringCovertible possibilita o uso da description, uma representacao textual de cada caso
+enum MenuOptions:Int, CaseIterable, CustomStringConvertible {
+    case yourTrips
+    case settings
+    case logout
+    
+    var description: String{
+        switch self {
+        case .yourTrips: return "Your Trips"
+        case .settings: return "Settings"
+        case .logout: return "Log Out"
+        }
+    }
+}
+
+//MARK: - Menu Controller
+
 class MenuController: UIViewController {
     
 //MARK: - Properties
+    
+    weak var delegate:MenuControllerDelegate?
     
     private let user : User
     
@@ -61,12 +88,21 @@ class MenuController: UIViewController {
 extension MenuController: UITableViewDelegate, UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return MenuOptions.allCases.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath)
-        cell.textLabel?.text = "Test Menu"
+        guard let menuOption = MenuOptions(rawValue: indexPath.row) else {return UITableViewCell()}
+        cell.textLabel?.text = menuOption.description
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let optionSelected = MenuOptions(rawValue: indexPath.row) else {return}
+        let cell = tableView.cellForRow(at: indexPath)
+        cell?.isSelected = false
+        delegate?.didSelect(option: optionSelected)
+        
     }
     
     

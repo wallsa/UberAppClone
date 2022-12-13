@@ -1,45 +1,17 @@
 //
-//  MenuHeader.swift
+//  UserInfoHeader.swift
 //  UberAppClone
 //
-//  Created by Wallace Santos on 11/12/22.
+//  Created by Wallace Santos on 12/12/22.
 //
 
 import UIKit
 
-class MenuHeader: UIView {
-
-//MARK: - Properties
-    
-    
-    private let user : User
-    
-    private let profileImage : UIImageView = {
-        let imageView = UIImageView()
-        imageView.backgroundColor = .lightGray
-        return imageView
-    }()
-    
-    private lazy var nameLabel : UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
-        label.text = "John Doe"
-        label.text = user.fullname
-        label.textColor = .white
-        return label
-    }()
-    
-    private lazy var emailLabel : UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
-        label.text = "text@gmail.com"
-        label.text = user.email
-        label.textColor = .lightGray
-        return label
-    }()
-    
+class UserInfoHeader:UIView {
     
 //MARK: - Life Cycle
+    
+    private let user:User
     
     init(user:User, frame:CGRect){
         self.user = user
@@ -52,9 +24,35 @@ class MenuHeader: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+//MARK: - Properties
+    
+    private let profileImage : UIImageView = {
+        let imageView = UIImageView()
+        imageView.backgroundColor = .lightGray
+        return imageView
+    }()
+    
+    private lazy var nameLabel : UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 16)
+        label.text = user.fullname
+        label.textColor = .white
+        return label
+    }()
+    
+    private lazy var emailLabel : UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.text = user.email
+        label.textColor = .lightGray
+        return label
+    }()
+    
+//MARK: - Helper Functions
+    
     func configureUI(){
         addSubview(profileImage)
-        profileImage.anchor(top: safeAreaLayoutGuide.topAnchor, left: leftAnchor, paddingTop: 4, paddingLeft: 12, width: 64, height: 64)
+        profileImage.anchor(top: safeAreaLayoutGuide.topAnchor, left: leftAnchor, paddingTop: 12, paddingLeft: 12, width: 64, height: 64)
         profileImage.layer.cornerRadius = 64/2
         let stack = UIStackView(arrangedSubviews: [nameLabel, emailLabel])
         stack.distribution = .fillEqually
