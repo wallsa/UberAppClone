@@ -21,10 +21,12 @@ class ContainerController: UIViewController {
     
     private var user:User?{
         didSet{
+            print("DEBUG: BEFORE SET USER")
             guard let user = user else {return}
+            print("DEBUG: AFTER SET USER")
             homeController.user = user
-            
             configureMenuController(withUser: user)
+            print("DEBUG: The user home is \(user.homeLocation)")
         }
     }
     
@@ -49,11 +51,16 @@ class ContainerController: UIViewController {
         if Auth.auth().currentUser?.uid == nil{
             DispatchQueue.main.async {
                 let nav = UINavigationController(rootViewController: LoginController())
+                if #available(iOS 13, *){
+                    nav.isModalInPresentation = true
+                }
+                
                 nav.modalPresentationStyle = .fullScreen
                 self.present(nav, animated: true)
             }
         }else{
             configure()
+            print("DEBUG: BEFORE SET USER 2")
         }
     }
     
@@ -163,7 +170,6 @@ extension ContainerController : HomeControllerDelegate{
 
 extension ContainerController: MenuControllerDelegate{
   
-    
     func didSelect(option: MenuOptions) {
         isExpanded.toggle()
         animateMenu(shouldExpand: isExpanded) { _ in
@@ -173,7 +179,9 @@ extension ContainerController: MenuControllerDelegate{
             case .settings:
                 guard let user = self.user else {return}
                 let controller = SettingsController(user: user)
+                controller.delegate = self
                 let navController = UINavigationController(rootViewController: controller)
+                
                 navController.isModalInPresentation = true
                 navController.modalTransitionStyle = .crossDissolve
                 navController.modalPresentationStyle = .fullScreen
@@ -186,6 +194,12 @@ extension ContainerController: MenuControllerDelegate{
             }
         }
     }
-    
-    
+}
+
+//MARK: - SettingsControllerDelegate
+
+extension ContainerController : SettingsControllerDelegate{
+    func updateUser(_ controller: SettingsController) {
+        self.user = controller.user
+    }
 }

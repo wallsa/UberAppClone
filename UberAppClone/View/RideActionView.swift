@@ -158,6 +158,7 @@ class RideActionView: UIView {
         case .cancel:
             delegate?.cancelTrip()
         case .getDirections:
+            //Direcionar ao aplicativo de mapas com a direcao do usuario
             print("DEBUG: HANDLE GET DIRECTIONS")
         case .pickup:
             delegate?.pickupPassenger()
@@ -200,6 +201,7 @@ class RideActionView: UIView {
   Cada usuario ve as informacoes do outro, nao as proprias */
     private func configureUI(withConfig config:RideActionViewConfiguration){
         switch config {
+            
         case .requestRide:
             buttonActionConfig = .requestRide
             actionButton.setTitle(buttonActionConfig.description, for: .normal)
@@ -258,9 +260,6 @@ class RideActionView: UIView {
                 actionButton.setTitle(buttonActionConfig.description, for: .normal)
             }
             localNameLabel.text = "Arrived At Destination"
-       
         }
     }
-    
-    
 }
